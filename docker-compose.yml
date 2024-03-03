@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  GitLab_Server:
+    image: gitlab/gitlab-ee:latest
+    container_name: gitlab_server
+    ports:
+      - "443:443" #HTTPS
+      - "22:22" #SSH
+      - "80:80" #Browser
+    volumes:
+      - $GITLAB_HOME/config:/etc/gitlab
+      - $GITLAB_HOME/logs:/var/log/gitlab
+      - $GITLAB_HOME/data:/var/opt/gitlab
+    shm_size: '256m'
+    networks:
+      - configuration_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  GitLab_Runner:
+    image: bitnami/gitlab-runner:latest
+    container_name: gitlab_runner
+    depends_on:
+      - GitLab_Server
+    ports:
+      - "9252:9252"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $GITLAB_HOME/gitlab_runner:/etc/gitlab_runner
+    networks:
+      - configuration_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  # Cadvisor:
+  # Node_Exporter:
+  # Prometheus_Server:
+  # Grafana:
+  # Nginx:
+  # Keycloak:
+
+networks:
+  configuration_network:
+    driver: bridge
