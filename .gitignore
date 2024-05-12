@@ -1,3 +1,4 @@
+.env
 prometheus/
 grafana/
 gitlab/
