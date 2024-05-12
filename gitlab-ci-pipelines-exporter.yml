@@ -1,0 +1,24 @@
+---
+log:
+  level: debug
+
+gitlab:
+  url: http://gitlab-ee
+  token: $GCPE_GITLAB_TOKEN
+
+project_defaults:
+  pull:
+    pipelines:
+      jobs:
+        enabled: true
+    refs:
+      branches:
+        enabled: true
+        regexp: ".*"
+
+# Dynamically fetch projects to monitor using a wildcard 
+# wildcards:
+#   - owner:
+#     name: xyz # name of the owner
+#     kind: group/user # kind of owner either 'group' or 'user'
+#     include_subgroups: true # if owner kind is 'group', whether to include subgroups
