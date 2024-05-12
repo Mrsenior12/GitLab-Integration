@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  GitLab_Server:
+    image: gitlab/gitlab-ee:16.9.8-ee.0
+    container_name: gitlab_server
+    ports:
+      - "443:443" #HTTPS
+      - "22:22" #SSH
+      - "80:80" #Browser
+    volumes:
+      - $GITLAB_HOME/config:/etc/gitlab
+      - $GITLAB_HOME/logs:/var/log/gitlab
+      - $GITLAB_HOME/data:/var/opt/gitlab
+    shm_size: '256m'
+    networks:
+      - configuration_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  GitLab_Runner:
+    image: bitnami/gitlab-runner:16.11.1
+    container_name: gitlab_runner
+    depends_on:
+      - GitLab_Server
+    ports:
+      - "9252:9252"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $GITLAB_HOME/gitlab_runner:/etc/gitlab_runner
+    networks:
+      - configuration_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  GitLab_CI_Pipeline_Exporter:
+    image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
+    container_name: GitLab_CI_Pipeline_Exporter
+    healthcheck:
+      test: ["CMD", "/bin/sh", "-c", "sh ./health_check.sh"]
+      interval: 10s
+      timeout: 15s
+      retries: 15
+      start_period: 45s
+    depends_on:
+      - GitLab_Server:
+        condition: services_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - GCPE_GITLAB_TOKEN=${GITLAB_TOKEN}
+      - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
+    volumes:
+      - ./gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
+      - ./health_check.sh:/health_check.sh
+    networks:
+      - configuration_network
+  # Cadvisor:
+  # Node_Exporter:
+  # Prometheus_Server:
+  # Grafana:
+  # Nginx:
+  # Keycloak:
+
+networks:
+  configuration_network:
+    driver: bridge
