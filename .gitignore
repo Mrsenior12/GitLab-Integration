@@ -3,3 +3,4 @@ prometheus/
 grafana/
 gitlab/
 keycloak/
+root_pwd.txt
