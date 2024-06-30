@@ -14,7 +14,6 @@ services:
       - $GITLAB_HOME/config:/etc/gitlab
       - $GITLAB_HOME/logs:/var/log/gitlab
       - $GITLAB_HOME/data:/var/opt/gitlab
-    shm_size: '256m'
     networks:
       - configuration_network
     deploy:
@@ -69,45 +68,45 @@ services:
   #     - configuration_network
   
   # Cadvisor exporter, following exporter analyzes and exposes resource usage and performance data from running containers.
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor_exporter
-    depends_on:
-      - gitlab_server
-      # - gitlab_runner
-    ports:
-      - "8080:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /dev/disk:/dev/disl:ro
-      - /var/lib/docker:/var/lib/docker
-    command: 
-      - "--raw_cgroup_prefix_whitelist=/docker/"
-    networks:
-      - configuration_network
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: cadvisor_exporter
+  #   depends_on:
+  #     - gitlab_server
+  #     # - gitlab_runner
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /dev/disk:/dev/disl:ro
+  #     - /var/lib/docker:/var/lib/docker
+  #   command: 
+  #     - "--raw_cgroup_prefix_whitelist=/docker/"
+  #   networks:
+  #     - configuration_network
 
   # Node Exporter, following exporter should gather data for hardware and OS metrics.
-  node:
-    image: bitnami/node-exporter:1.8.1
-    container_name: node_exporter
-    depends_on:
-      - gitlab_server
-      # - gitlab_runner
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command: 
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
-    networks:
-      - configuration_network  
+  # node:
+  #   image: bitnami/node-exporter:1.8.1
+  #   container_name: node_exporter
+  #   depends_on:
+  #     - gitlab_server
+  #     # - gitlab_runner
+  #   ports:
+  #     - "9100:9100"
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command: 
+  #     - "--path.procfs=/host/proc"
+  #     - "--path.rootfs=/rootfs"
+  #     - "--path.sysfs=/host/sys"
+  #     - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+  #   networks:
+  #     - configuration_network  
 
   
   # Prometheus_Server:
