@@ -27,6 +27,13 @@ while getopts irp: opt; do
     esac
 done
 
+if [[ $(docker ps | egrep "gitlab_server" | awk '{print $7}') != "Up" ]]; then
+    echo "GitLab instance is not running"
+    exit 1
+fi
+
+source .env
+
 get_gitlab_initpassword() {
     INIT_PWD=$(docker exec gitlab_server grep "Password:" /etc/gitlab/initial_root_password | awk '{print $2}' )
     if [[ ${GITLAB_ROOT_PWD} == "" ]]; then
@@ -41,33 +48,10 @@ change_init_password(){
         echo "Unable to fetch root password"
         exit 1
     fi;
-
-    STATUS=$(curl -s --request PUT "${GITLAB_URL}/api/v4/users/1" \
-        --header "PRIVATE-TOKEN: ${GITLAB_ROOT_PWD}" \
-        --header "Content-Type: application/json" \
-        --data "{\"password\":\"${NEW_PASSWORD}\"}")
-
-    if echo "${STATUS}" | grep -q "errors"; then
-        echo "Error while changeing password"
-        return 1
-    fi;
+    
+    docker exec -it gitlab_server gitlab-rails runner "user = User.find_by_username('root'); user.password = '${NEW_PASSWORD}'; user.password_confirmation = '${NEW_PASSWORD}'; user.save!"
 
 }
-
-if [[ ! -f ".env" ]]; then
-    echo "Creating .env file with neccessary options to register GitLab runner"
-    cat <<EOF > .env
-GITLAB_HOME=./gitlab
-GITLAB_URL=${GITLAB_URL}
-GITLAB_ROOT_PWD=
-GITLAB_USER_PWD=
-GITLAB_REGISTRY_TOKEN=
-GITLAB_PERSONAL_TOKEN=
-EOF
-fi;
-
-# Load Environmental Variables
-source .env
 
 if [[ ${GET_INIT} == 1 ]]; then
     echo "Saving GitLab root init password to .env file"
@@ -78,7 +62,5 @@ if [[ ${NEW_PASSWORD} != "" ]]; then
     echo "Changing default password"
     change_init_password
     sed -i "/^GITLAB_USER_PWD=.*/c\GITLAB_USER_PWD=\"${NEW_PASSWORD}\"" ".env"
-
-
 fi;
 
