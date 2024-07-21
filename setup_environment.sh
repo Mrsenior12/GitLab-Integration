@@ -6,12 +6,16 @@ GITLAB_URL="http:localhost:80"
 if [[ ! -f ".env" ]]; then
     echo "Creating .env file with neccessary options to register GitLab runner"
     cat <<EOF > .env
+## GitLab Environment
 GITLAB_HOME=./gitlab
 GITLAB_URL=${GITLAB_URL}
 GITLAB_ROOT_PWD=
 GITLAB_USER_PWD=
 GITLAB_REGISTRY_TOKEN=
 GITLAB_PERSONAL_TOKEN=
+
+## Prometheus Environment
+PROMETHEUS_HOME=./prometheus
 EOF
 fi;
 
