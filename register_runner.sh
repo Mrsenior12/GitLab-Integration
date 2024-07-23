@@ -27,7 +27,7 @@ while getopts irp: opt; do
     esac
 done
 
-if [[ $(docker ps | egrep "gitlab_server" | awk '{print $7}') != "Up" ]]; then
+if [[ $(docker ps | egrep "gitlab" | awk '{print $10}') != "(healthy)" ]]; then
     echo "GitLab instance is not running"
     exit 1
 fi
@@ -35,7 +35,7 @@ fi
 source .env
 
 get_gitlab_initpassword() {
-    INIT_PWD=$(docker exec gitlab_server grep "Password:" /etc/gitlab/initial_root_password | awk '{print $2}' )
+    INIT_PWD=$(docker exec gitlab grep "Password:" /etc/gitlab/initial_root_password | awk '{print $2}' )
     if [[ ${GITLAB_ROOT_PWD} == "" ]]; then
         sed -i "/^GITLAB_ROOT_PWD=.*/c\GITLAB_ROOT_PWD=\"${INIT_PWD}\"" ".env"
     fi; 
@@ -49,7 +49,7 @@ change_init_password(){
         exit 1
     fi;
     
-    docker exec -it gitlab_server gitlab-rails runner "user = User.find_by_username('root'); user.password = '${NEW_PASSWORD}'; user.password_confirmation = '${NEW_PASSWORD}'; user.save!"
+    docker exec -it gitlab gitlab-rails runner "user = User.find_by_username('root'); user.password = '${NEW_PASSWORD}'; user.password_confirmation = '${NEW_PASSWORD}'; user.save!"
 
 }
 

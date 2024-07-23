@@ -10,6 +10,13 @@ services:
       - "443:443" #HTTPS
       - "22:22" #SSH
       - "80:80" #Browser
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab'
+        prometheus['enable'] = false
+
+        gitlab_rails['monitoring_whitelist'] = ['172.0.0.0/8', '192.168.0.1']
+
     volumes:
       - $GITLAB_HOME/config:/etc/gitlab
       - $GITLAB_HOME/logs:/var/log/gitlab
@@ -44,69 +51,68 @@ services:
   #       window: 120s
 
   # GitLab CI Pipeline Exporter, following exporter allows to monitor GitLab CI/CD pipelines.
-  # gitlab_ci_pipeline_exporter:
-  #   image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
-  #   container_name: gitlab_ci_pipeline_exporter
-  #   healthcheck:
-  #     test: ["CMD", "/bin/sh", "-c", "sh ./health_check.sh"]
-  #     interval: 10s
-  #     timeout: 15s
-  #     retries: 15
-  #     start_period: 45s
-  #   depends_on:
-  #     - GitLab_Server:
-  #       condition: services_healthy
-  #   ports:
-  #     - "8088:8080"
-  #   environment:
-  #     - GCPE_GITLAB_TOKEN=$GITLAB_TOKEN
-  #     - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
-  #   volumes:
-  #     - ./gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
-  #     - ./health_check.sh:/health_check.sh
-  #   networks:
-  #     - configuration_network
-  
-  # Cadvisor exporter, following exporter analyzes and exposes resource usage and performance data from running containers.
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor_exporter
+  gitlab_ci_pipeline_exporter:
+    image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
+    container_name: gitlab_ci_pipeline_exporter
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "sh ./health_check.sh"]
+      interval: 10s
+      timeout: 15s
+      retries: 15
+      start_period: 45s
     depends_on:
-      - gitlab_server
-      # - gitlab_runner
+      gitlab_server:
+        condition: service_healthy
     ports:
-      - "8080:8080"
+      - "8088:8080"
+    environment:
+      - GCPE_GITLAB_TOKEN=$GITLAB_PERSONAL_TOKEN
+      - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
+      - GCPE_INTERNAL_MONITORING_LISTENER_ADDRESS=tcp://127.0.0.1:8082
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /dev/disk:/dev/disl:ro
-      - /var/lib/docker:/var/lib/docker
-    command: 
-      - "--raw_cgroup_prefix_whitelist=/docker/"
+      - ./gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
+      - ./health_check.sh:/health_check.sh
     networks:
       - configuration_network
+  
+  # Cadvisor exporter, following exporter analyzes and exposes resource usage and performance data from running containers.
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: cadvisor_exporter
+  #   depends_on:
+  #     - gitlab_server
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /dev/disk:/dev/disl:ro
+  #     - /var/lib/docker:/var/lib/docker
+  #   command: 
+  #     - "--raw_cgroup_prefix_whitelist=/docker/"
+  #   networks:
+  #     - configuration_network
 
   # Node Exporter, following exporter should gather data for hardware and OS metrics.
-  node:
-    image: bitnami/node-exporter:1.8.1
-    container_name: node_exporter
-    depends_on:
-      - gitlab_server
-      # - gitlab_runner
-    ports:
-      - "9100:9100"
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command: 
-      - "--path.procfs=/host/proc"
-      - "--path.rootfs=/rootfs"
-      - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
-    networks:
-      - configuration_network  
+  # node:
+  #   image: bitnami/node-exporter:1.8.1
+  #   container_name: node_exporter
+  #   depends_on:
+  #     - gitlab_server
+  #   ports:
+  #     - "9100:9100"
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command: 
+  #     - "--path.procfs=/host/proc"
+  #     - "--path.rootfs=/rootfs"
+  #     - "--path.sysfs=/host/sys"
+  #     - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+  #   networks:
+  #     - configuration_network  
 
   # Prometheus Server, tool for gathering metrics from services
   Prometheus_Server: 

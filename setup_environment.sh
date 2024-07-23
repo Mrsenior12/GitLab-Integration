@@ -11,7 +11,9 @@ GITLAB_HOME=./gitlab
 GITLAB_URL=${GITLAB_URL}
 GITLAB_ROOT_PWD=
 GITLAB_USER_PWD=
+GITLAB_ACCESS_TOKEN=
 GITLAB_REGISTRY_TOKEN=
+# GitLab Personal Access Token with repo read permissions
 GITLAB_PERSONAL_TOKEN=
 
 ## Prometheus Environment
