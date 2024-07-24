@@ -6,8 +6,9 @@ GITLAB_PWD=""
 GET_INIT=0
 REGISTER_RUNNER=0
 NEW_PASSWORD=""
+TOKEN_TYPE=""
 
-while getopts irp: opt; do
+while getopts irp:t: opt; do
     case ${opt} in
         i) 
         # Option for fetching root_init_password from /etc/gitlab/initial_root_password
@@ -23,6 +24,11 @@ while getopts irp: opt; do
         # Option used to set custom password for root user in GitLab instance
         # Provided password will be saved in .env file
             NEW_PASSWORD=${OPTARG}
+            ;;
+        t)
+        # Option used to specify which Personal Access Token should be created
+        # Currently supporter: runner, exporter
+            TOKEN_TYPE=${OPTARG}
             ;;
     esac
 done
@@ -42,7 +48,6 @@ get_gitlab_initpassword() {
 }
 
 change_init_password(){
-
     get_gitlab_initpassword
     if [[ ${GITLAB_ROOT_PWD} == "" ]]; then
         echo "Unable to fetch root password"
@@ -53,9 +58,22 @@ change_init_password(){
 
 }
 
+generate_personal_access_token(){
+    local TOKEN_NAME=${1}
+    local TOKEN_SCOPE=${2}
+    local TOKEN_SHA=${3}
+
+    docker exec -it \
+        --env TOKEN_NAME=${TOKEN_NAME} \
+        --env TOKEN_SCOPE=${TOKEN_SCOPE} \
+        --env TOKEN_VALUE=${TOKEN_SHA} gitlab \
+        /bin/bash gitlab-rails runner "token = User.find_by_username('root').personal_access_tokens.create(scopes: ['${TOKEN_SCOPE}'], name: '${TOKEN_NAME}', expires_at: 1.year.from_now); \
+                                        token.set_token('${TOKEN_VALUE}'); \
+                                        token.save!"
+}
+
 if [[ ${GET_INIT} == 1 ]]; then
-    echo "Saving GitLab root init password to .env file"
-    get_gitlab_initpassword
+    echo "Saving GitLab root init password to .env file"    
 fi
 
 if [[ ${NEW_PASSWORD} != "" ]]; then
@@ -64,3 +82,17 @@ if [[ ${NEW_PASSWORD} != "" ]]; then
     sed -i "/^GITLAB_USER_PWD=.*/c\GITLAB_USER_PWD=\"${NEW_PASSWORD}\"" ".env"
 fi;
 
+if [[ ${TOKEN_TYPE} == "runner" ]]; then
+
+    SHA_VALUE=$(echo $RANDOM | shasum | head -c 30)
+    generate_personal_access_token "GitLab-Runner-Token3" "create_runner" "${SHA_VALUE}"
+    sed -i "/^GITLAB_PERSONAL_TOKEN_RUNNER=.*/c\GITLAB_PERSONAL_TOKEN_RUNNER=\"${VALUE}\"" ".env"
+
+elif [[ ${TOKEN_TYPE} == "exporter" ]]; then
+
+    SHA_VALUE=$(echo $RANDOM | shasum | head -c 30)
+    echo $SHA_VALUE
+    generate_personal_access_token "GitLab-Exporter-Token3" "read_api" "${SHA_VALUE}"
+    sed -i "/^GITLAB_PERSONAL_TOKEN=.*/c\GITLAB_PERSONAL_TOKEN=\"${SHA_VALUE}\"" ".env"
+
+fi

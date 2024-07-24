@@ -31,24 +31,24 @@ services:
         window: 120s
 
   # GitLab Runner, container responsible for fetching and running pipeline jobs in GitLab CI.
-  # gitlab_runner:
-  #   image: bitnami/gitlab-runner:16.11.1
-  #   container_name: gitlab_runner
-  #   depends_on:
-  #     - gitlab_server
-  #   ports:
-  #     - "9252:9252"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - $GITLAB_HOME/gitlab_runner:/etc/gitlab_runner
-  #   networks:
-  #     - configuration_network
-  #   deploy:
-  #     restart_policy:
-  #       condition: on-failure
-  #       delay: 5s
-  #       max_attempts: 3
-  #       window: 120s
+  gitlab_runner:
+    image: bitnami/gitlab-runner:16.11.1
+    container_name: gitlab_runner
+    depends_on:
+      - gitlab_server
+    ports:
+      - "9252:9252"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $GITLAB_HOME/gitlab_runner:/etc/gitlab_runner
+    networks:
+      - configuration_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   # GitLab CI Pipeline Exporter, following exporter allows to monitor GitLab CI/CD pipelines.
   gitlab_ci_pipeline_exporter:
@@ -76,43 +76,43 @@ services:
       - configuration_network
   
   # Cadvisor exporter, following exporter analyzes and exposes resource usage and performance data from running containers.
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   container_name: cadvisor_exporter
-  #   depends_on:
-  #     - gitlab_server
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /dev/disk:/dev/disl:ro
-  #     - /var/lib/docker:/var/lib/docker
-  #   command: 
-  #     - "--raw_cgroup_prefix_whitelist=/docker/"
-  #   networks:
-  #     - configuration_network
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor_exporter
+    depends_on:
+      - gitlab_server
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /dev/disk:/dev/disl:ro
+      - /var/lib/docker:/var/lib/docker
+    command: 
+      - "--raw_cgroup_prefix_whitelist=/docker/"
+    networks:
+      - configuration_network
 
   # Node Exporter, following exporter should gather data for hardware and OS metrics.
-  # node:
-  #   image: bitnami/node-exporter:1.8.1
-  #   container_name: node_exporter
-  #   depends_on:
-  #     - gitlab_server
-  #   ports:
-  #     - "9100:9100"
-  #   volumes:
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /:/rootfs:ro
-  #   command: 
-  #     - "--path.procfs=/host/proc"
-  #     - "--path.rootfs=/rootfs"
-  #     - "--path.sysfs=/host/sys"
-  #     - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
-  #   networks:
-  #     - configuration_network  
+  node:
+    image: bitnami/node-exporter:1.8.1
+    container_name: node_exporter
+    depends_on:
+      - gitlab_server
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: 
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    networks:
+      - configuration_network  
 
   # Prometheus Server, tool for gathering metrics from services
   Prometheus_Server: 
