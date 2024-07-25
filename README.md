@@ -4,9 +4,9 @@
     - [ X ] Enable metrics for Cadvisor
     - [ X ] Enable metrics for Node Exporter
     - [ ] GitLab sample project to verify if CI/CD runs properly
-- [ ] GitLab Runner:
-    - [ ] Create Runner for docker
-    - [ ] Add to script ability to generate them with single script execution
+- [ X ] GitLab Runner:
+    - [ X ] Create Runner for docker
+    - [ X ] Add to script ability to generate them with single script execution
 - [ ] Keycloak:
     - [ ] Create Realm for Grafana
     - [ ] Create Realm for GitLab (if possible)
