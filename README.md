@@ -30,16 +30,16 @@
 1. Inside repository you'll find `./register_eunner.sh`. It's used to:
 - fetch `root init password` from GitLab instance (file with this password will be removed automatically after 24h): `./register_runner.sh -i`
 - change `root` user password, to password given by user: `./register_runner.sh -p <your_password>`
-- create `Personal Access Tokens` `./register_runner.sh -t runner|exporter` with:
-    - `read_api` permission (oprion `exporter`) required by GitLab-ci-pipeline-exporter
-    - `create_runner` permission (option `runner`) required to register runners  
+- create `Personal Access Tokens` for exporter (with `read_api` permissions) `./register_runner.sh -t`
+- register `docker:latest` runner for `GitLab CI/CD` `./register_runner.sh -r`
+
 
 ## How to setup GitLab-CI-pipeline-exporter with bash script:
 1. Create and start GitLab instance
 2. execute:
 ```bash
 # Following command will generate Personal Access Token with read_api permission and save key value to .env file
-./register_runner -t exporter
+./register_runner -t
 ```
 3. Restart `gitlab_ci_pipeline_exporter` service
 

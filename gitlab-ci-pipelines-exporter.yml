@@ -5,7 +5,7 @@ log:
 gitlab:
   # url: "http://localhost:80"
   url: "http://gitlab:80"
-  token: ${GITLAB_PERSONAL_TOKEN}
+  token: ${GITLAB_PERSONAL_TOKEN_EXPORTER}
 
 project_defaults:
   pull:

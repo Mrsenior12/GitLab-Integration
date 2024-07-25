@@ -14,10 +14,11 @@ GITLAB_USER_PWD=
 GITLAB_ACCESS_TOKEN=
 
 ## GitLab Personal Access Token with repo read permissions required by gitlab-ci-pipeline-exporter
-GITLAB_PERSONAL_TOKEN=
+GITLAB_PERSONAL_TOKEN_EXPORTER=
 
 ## GitLab Personal Access Token with create_runner permissions
 GITLAB_PERSONAL_TOKEN_RUNNER=
+GITLAB_RUNNER_AUTH_TOKEN=
 
 ## Prometheus Environment
 PROMETHEUS_HOME=./prometheus
@@ -30,7 +31,7 @@ fi;
 # Load Environmental Variables
 source .env
 
-REQUIRED_DIRECTORIES=("${GITLAB_HOME}")
+REQUIRED_DIRECTORIES=("${GITLAB_HOME}" "${GITLAB_HOME}/gitlab-runner" "${PROMETHEUS_HOME}" "${GRAFANA_HOME}")
 
 for DIRECTORY in "${REQUIRED_DIRECTORIES[@]}"
 do

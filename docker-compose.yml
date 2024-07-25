@@ -32,7 +32,7 @@ services:
 
   # GitLab Runner, container responsible for fetching and running pipeline jobs in GitLab CI.
   gitlab_runner:
-    image: bitnami/gitlab-runner:16.11.1
+    image: gitlab/gitlab-runner:alpine3.19
     container_name: gitlab_runner
     depends_on:
       - gitlab_server
@@ -40,7 +40,7 @@ services:
       - "9252:9252"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - $GITLAB_HOME/gitlab_runner:/etc/gitlab_runner
+      - '$GITLAB_HOME/gitlab-runner:/etc/gitlab-runner'
     networks:
       - configuration_network
     deploy:
@@ -66,7 +66,7 @@ services:
     ports:
       - "8088:8080"
     environment:
-      - GCPE_GITLAB_TOKEN=$GITLAB_PERSONAL_TOKEN
+      - GCPE_GITLAB_TOKEN=${GITLAB_PERSONAL_TOKEN_EXPORTER}
       - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
       - GCPE_INTERNAL_MONITORING_LISTENER_ADDRESS=tcp://127.0.0.1:8082
     volumes:
@@ -133,4 +133,5 @@ services:
 
 networks:
   configuration_network:
+    name: gitlab_network
     driver: bridge
