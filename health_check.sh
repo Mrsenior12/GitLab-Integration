@@ -1,7 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-wget --quiet --tries=1 --spider "http://gitlab_server:80" >/dev/null 2>&1   
-if [[ $? -eq 0 ]]; then
+RESPONSE_CODE=$(curl -o /dev/null --silent --head --write-out '%{http_code}\n' "http://localhost:80")   
+
+if [[ $? -eq 0 && ${RESPONSE_CODE} -eq 302 ]]; then
     echo 0
 else
     echo 1

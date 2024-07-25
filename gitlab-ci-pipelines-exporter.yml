@@ -3,8 +3,9 @@ log:
   level: debug
 
 gitlab:
-  url: http://gitlab-ee
-  token: $GCPE_GITLAB_TOKEN
+  # url: "http://localhost:80"
+  url: "http://gitlab:80"
+  token: ${GITLAB_PERSONAL_TOKEN_EXPORTER}
 
 project_defaults:
   pull:
@@ -15,6 +16,9 @@ project_defaults:
       branches:
         enabled: true
         regexp: ".*"
+  
+wildcards:
+  - {}
 
 # Dynamically fetch projects to monitor using a wildcard 
 # wildcards:
