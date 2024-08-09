@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GITLAB_URL="http:localhost:80"
+GITLAB_URL="http://gitlab:80"
 
 # Create .env file if it doesn't exist
 if [[ ! -f ".env" ]]; then
@@ -11,7 +11,6 @@ GITLAB_HOME=./gitlab
 GITLAB_URL=${GITLAB_URL}
 GITLAB_ROOT_PWD=
 GITLAB_USER_PWD=
-GITLAB_ACCESS_TOKEN=
 
 ## GitLab Personal Access Token with repo read permissions required by gitlab-ci-pipeline-exporter
 GITLAB_PERSONAL_TOKEN_EXPORTER=
@@ -25,6 +24,15 @@ PROMETHEUS_HOME=./prometheus
 
 ## Grafana Envirnment
 GRAFANA_HOME=./grafana
+
+## Blackbox Environment
+BLACKBOX_HOME=./blackbox
+
+## GitLab-ci-pipeline-exporter Environment
+GITLAB_CI_EXPORTER_HOME=./gitlab-ci-exporter
+
+## Scripts Directory
+SCRIPTS_HOME=./scripts
 EOF
 fi;
 

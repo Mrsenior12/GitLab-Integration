@@ -45,10 +45,11 @@ services:
         registry_external_url 'http://registry.example.com:5005'
         registry['enable'] = true
         registry['debug_addr'] = '0.0.0.0:5001'
+        
     volumes:
-      - $GITLAB_HOME/config:/etc/gitlab
-      - $GITLAB_HOME/logs:/var/log/gitlab
-      - $GITLAB_HOME/data:/var/opt/gitlab
+      - ${GITLAB_HOME}/config:/etc/gitlab
+      - ${GITLAB_HOME}/logs:/var/log/gitlab
+      - ${GITLAB_HOME}/data:/var/opt/gitlab
     networks:
       - configuration_network
     deploy:
@@ -67,7 +68,7 @@ services:
       - "9252:9252"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - '$GITLAB_HOME/gitlab-runner:/etc/gitlab-runner'
+      - '${GITLAB_HOME}/gitlab-runner:/etc/gitlab-runner'
     networks:
       - configuration_network
     deploy:
@@ -80,12 +81,12 @@ services:
   gitlab_ci_pipeline_exporter:
     image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
     container_name: gitlab_ci_pipeline_exporter
-    healthcheck:
-      test: ["CMD", "/bin/bash", "-c", "sh ./health_check.sh"]
-      interval: 10s
-      timeout: 15s
-      retries: 15
-      start_period: 45s
+    # healthcheck:
+    #   test: ["CMD", "/bin/sh", "-c", "sh ${SCRIPTS_HOME}/health_check.sh"]
+    #   interval: 10s
+    #   timeout: 20s
+    #   retries: 15
+    #   start_period: 45s
     depends_on:
       gitlab_server:
         condition: service_healthy
@@ -96,8 +97,8 @@ services:
       - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
       - GCPE_INTERNAL_MONITORING_LISTENER_ADDRESS=tcp://127.0.0.1:8082
     volumes:
-      - ./gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
-      - ./health_check.sh:/health_check.sh
+      - ${GITLAB_CI_EXPORTER_HOME}/gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
+      - ${SCRIPTS_HOME}/health_check.sh:/health_check.sh
     networks:
       - configuration_network
   
@@ -147,7 +148,7 @@ services:
     ports:
       - "9115:9115"
     volumes:
-      - ./blackbox/config-blackbox.yml:/etc/blackboxexporter/config.yml
+      - ${BLACKBOX_HOME}/config-blackbox.yml:/etc/blackboxexporter/config.yml
     command: 
       - "--config.file=/etc/blackboxexporter/config.yml"
     networks:
@@ -160,7 +161,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - $PROMETHEUS_HOME/:/etc/prometheus/
+      - ${PROMETHEUS_HOME}/:/etc/prometheus/
     command: 
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
