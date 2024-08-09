@@ -10,7 +10,7 @@ services:
       - "443:443" #HTTPS
       - "22:22" #SSH
       - "80:80" #Browser
-      - "5000:5000" #Registry
+      - "5005:5005" #Registry
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://gitlab'
@@ -41,7 +41,10 @@ services:
         }
 
         pgbouncer_exporter['listen_address'] = '0.0.0.0:9188'
-        
+
+        registry_external_url 'http://registry.example.com:5005'
+        registry['enable'] = true
+        registry['debug_addr'] = '0.0.0.0:5001'
     volumes:
       - $GITLAB_HOME/config:/etc/gitlab
       - $GITLAB_HOME/logs:/var/log/gitlab
@@ -50,9 +53,8 @@ services:
       - configuration_network
     deploy:
       restart_policy:
-        condition: on-failure
+        condition: unless-stopped
         delay: 5s
-        max_attempts: 3
         window: 120s
 
   # GitLab Runner, container responsible for fetching and running pipeline jobs in GitLab CI.
@@ -70,9 +72,8 @@ services:
       - configuration_network
     deploy:
       restart_policy:
-        condition: on-failure
+        condition: unless-stopped
         delay: 5s
-        max_attempts: 3
         window: 120s
 
   # GitLab CI Pipeline Exporter, following exporter allows to monitor GitLab CI/CD pipelines.
