@@ -25,6 +25,15 @@ PROMETHEUS_HOME=./prometheus
 
 ## Grafana Envirnment
 GRAFANA_HOME=./grafana
+
+## Blackbox Environment
+BLACKBOX_HOME=./blackbox
+
+## GitLab-ci-pipeline-exporter Environment
+GITLAB_CI_EXPORTER_HOME=./gitlab-ci-exporter
+
+## Scripts Directory
+SCRIPTS_HOME=./scripts
 EOF
 fi;
 
