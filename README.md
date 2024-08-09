@@ -13,8 +13,8 @@
 - [ ] Grafana
     - [ ] Create Sample dashboard with repo monitoring
     - [ ] Create Sample dashboard with CI/CD monitoring
-- [ ] Prometheus
-    - [ ] Add rules for neccesery metrics for GitLab, Registry, etc.
+- [ X ] Prometheus
+    - [ X ] Add rules for neccesery metrics for GitLab, Registry, etc.
 - [ ] Nginx
     - [ ] Use Nginx as proxy server for GitLab and Grafana
 
