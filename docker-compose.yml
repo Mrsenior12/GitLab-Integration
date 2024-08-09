@@ -45,6 +45,7 @@ services:
         registry_external_url 'http://registry.example.com:5005'
         registry['enable'] = true
         registry['debug_addr'] = '0.0.0.0:5001'
+        
     volumes:
       - ${GITLAB_HOME}/config:/etc/gitlab
       - ${GITLAB_HOME}/logs:/var/log/gitlab
@@ -80,12 +81,12 @@ services:
   gitlab_ci_pipeline_exporter:
     image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
     container_name: gitlab_ci_pipeline_exporter
-    healthcheck:
-      test: ["CMD", "/bin/bash", "-c", "sh ./health_check.sh"]
-      interval: 10s
-      timeout: 15s
-      retries: 15
-      start_period: 45s
+    # healthcheck:
+    #   test: ["CMD", "/bin/sh", "-c", "sh ${SCRIPTS_HOME}/health_check.sh"]
+    #   interval: 10s
+    #   timeout: 20s
+    #   retries: 15
+    #   start_period: 45s
     depends_on:
       gitlab_server:
         condition: service_healthy
