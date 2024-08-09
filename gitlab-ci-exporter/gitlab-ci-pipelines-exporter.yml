@@ -3,9 +3,8 @@ log:
   level: debug
 
 gitlab:
-  # url: "http://localhost:80"
-  url: "http://gitlab:80"
-  token: ${GITLAB_PERSONAL_TOKEN_EXPORTER}
+  url: http://gitlab:80
+  token: ${GCPE_GITLAB_TOKEN}
 
 project_defaults:
   pull:

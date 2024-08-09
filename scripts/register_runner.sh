@@ -8,7 +8,7 @@ REGISTER_RUNNER=0
 NEW_PASSWORD=""
 TOKEN_TYPE=""
 
-while getopts irpt: opt; do
+while getopts irtp: opt; do
     case ${opt} in
         i) 
         # Option for fetching root_init_password from /etc/gitlab/initial_root_password
@@ -74,6 +74,7 @@ generate_personal_access_token(){
 
 if [[ ${GET_INIT} == 1 ]]; then
     echo "Saving GitLab root init password to .env file"    
+    get_gitlab_initpassword
 fi
 
 if [[ ${NEW_PASSWORD} != "" ]]; then
@@ -83,19 +84,20 @@ if [[ ${NEW_PASSWORD} != "" ]]; then
 fi;
 
 if [[ ${TOKEN_TYPE} == "exporter" ]]; then
-    echo "--- Creating Personal Access Token for GitLab-CI-pipeline-exporter ---"
+    if [[ ${GITLAB_PERSONAL_TOKEN_EXPORTER} == "" ]]; then
+        echo "--- Creating Personal Access Token for GitLab-CI-pipeline-exporter ---"
 
-    SHA_VALUE=$(echo $RANDOM | shasum | head -c 30)
-    generate_personal_access_token "GitLab-Exporter-TokenV2" "read_api" "${SHA_VALUE}"
-    sed -i "/^GITLAB_PERSONAL_TOKEN_EXPORTER=.*/c\GITLAB_PERSONAL_TOKEN_EXPORTER=\"${SHA_VALUE}\"" ".env"
-
+        SHA_VALUE=$(echo $RANDOM | shasum | head -c 30)
+        generate_personal_access_token "GitLab-Exporter-TokenV2" "read_api" "${SHA_VALUE}"
+        sed -i "/^GITLAB_PERSONAL_TOKEN_EXPORTER=.*/c\GITLAB_PERSONAL_TOKEN_EXPORTER=\"${SHA_VALUE}\"" ".env"
+    fi
 fi
 
 if [[ ${REGISTER_RUNNER} == 1 ]]; then
     if [[ ${GITLAB_PERSONAL_TOKEN_RUNNER} == "" ]]; then
         echo "--- Creating Personal Access Token for GitLab Runner ---"
         SHA_VALUE=$(echo $RANDOM | shasum | head -c 30)
-        generate_personal_access_token "GitLab-Runner-TokenV2" "create_runner" "${SHA_VALUE}"
+        generate_personal_access_token "GitLab-Runner-TokenV3" "create_runner" "${SHA_VALUE}"
     
 
         sed -i "/^GITLAB_PERSONAL_TOKEN_RUNNER=.*/c\GITLAB_PERSONAL_TOKEN_RUNNER=\"${SHA_VALUE}\"" ".env"
@@ -111,14 +113,14 @@ if [[ ${REGISTER_RUNNER} == 1 ]]; then
 
     echo "--- Registering GitLab Runner ---"
     docker exec --env GITLAB_RUNNER_AUTH_TOKEN=${GITLAB_RUNNER_AUTH_TOKEN} \
-                --env URL="http://gitlab:80" \
+                --env GITLAB_URL=${GITLAB_URL} \
                 gitlab_runner gitlab-runner register \
                 --non-interactive \
-                --url "${URL}" \
+                --url "${GITLAB_URL}" \
                 --token "${GITLAB_RUNNER_AUTH_TOKEN}" \
                 --executor "docker" \
                 --docker-image docker:latest \
-                --description "docker-runner"   
+                --description "docker-runner"
 
     # Add to register runner configuration additional information
     docker exec gitlab_runner sed -i '/network_mtu = 0/a\    network_mode = "gitlab_network"' /etc/gitlab-runner/config.toml 
