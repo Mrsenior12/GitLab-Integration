@@ -7,31 +7,31 @@
 - [ X ] GitLab Runner:
     - [ X ] Create Runner for docker
     - [ X ] Add to script ability to generate them with single script execution
-- [ ] Keycloak:
-    - [ ] Create Realm for Grafana
-    - [ ] Create Realm for GitLab (if possible)
+- [ X ] Prometheus
+    - [ X ] Add rules for neccesery metrics for GitLab, Registry, etc.
 - [ ] Grafana
     - [ ] Create Sample dashboard with repo monitoring
     - [ ] Create Sample dashboard with CI/CD monitoring
-- [ X ] Prometheus
-    - [ X ] Add rules for neccesery metrics for GitLab, Registry, etc.
 - [ ] Nginx
     - [ ] Use Nginx as proxy server for GitLab and Grafana
+- [ ] Keycloak:
+    - [ ] Create Realm for Grafana
+    - [ ] Create Realm for GitLab (if possible)
 
 ## How to setup environment:
 1. Clone repository
 2. Inside repository execute following command:
 ```bash
 # Script will create empty .env and creates necessary directories for each available service
-./setup_environment.sh
+./scripts/setup_environment.sh
 ```
 
 ## How to fill `.env` file:
-1. Inside repository you'll find `./register_eunner.sh`. It's used to:
-- fetch `root init password` from GitLab instance (file with this password will be removed automatically after 24h): `./register_runner.sh -i`
-- change `root` user password, to password given by user: `./register_runner.sh -p <your_password>`
-- create `Personal Access Tokens` for exporter (with `read_api` permissions) `./register_runner.sh -t`
-- register `docker:latest` runner for `GitLab CI/CD` `./register_runner.sh -r`
+1. Inside repository you'll find `./scripts/register_runner.sh`. It's used to:
+- fetch `root init password` from GitLab instance (file with this password will be removed automatically after 24h): `./scripts/register_runner.sh -i`
+- change `root` user password, to password given by user: `./scripts/register_runner.sh -p <your_password>`
+- create `Personal Access Tokens` for exporter (with `read_api` permissions) `./scripts/register_runner.sh -t`
+- register `docker:latest` runner for `GitLab CI/CD` `./scripts/register_runner.sh -r`
 
 
 ## How to setup GitLab-CI-pipeline-exporter with bash script:

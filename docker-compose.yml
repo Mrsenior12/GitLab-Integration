@@ -46,9 +46,9 @@ services:
         registry['enable'] = true
         registry['debug_addr'] = '0.0.0.0:5001'
     volumes:
-      - $GITLAB_HOME/config:/etc/gitlab
-      - $GITLAB_HOME/logs:/var/log/gitlab
-      - $GITLAB_HOME/data:/var/opt/gitlab
+      - ${GITLAB_HOME}/config:/etc/gitlab
+      - ${GITLAB_HOME}/logs:/var/log/gitlab
+      - ${GITLAB_HOME}/data:/var/opt/gitlab
     networks:
       - configuration_network
     deploy:
@@ -67,7 +67,7 @@ services:
       - "9252:9252"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - '$GITLAB_HOME/gitlab-runner:/etc/gitlab-runner'
+      - '${GITLAB_HOME}/gitlab-runner:/etc/gitlab-runner'
     networks:
       - configuration_network
     deploy:
@@ -96,8 +96,8 @@ services:
       - GCPE_CONFIG=/etc/gitlab-ci-pipelines-exporter.yml
       - GCPE_INTERNAL_MONITORING_LISTENER_ADDRESS=tcp://127.0.0.1:8082
     volumes:
-      - ./gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
-      - ./health_check.sh:/health_check.sh
+      - ${GITLAB_CI_EXPORTER_HOME}/gitlab-ci-pipelines-exporter.yml:/etc/gitlab-ci-pipelines-exporter.yml
+      - ${SCRIPTS_HOME}/health_check.sh:/health_check.sh
     networks:
       - configuration_network
   
@@ -147,7 +147,7 @@ services:
     ports:
       - "9115:9115"
     volumes:
-      - ./blackbox/config-blackbox.yml:/etc/blackboxexporter/config.yml
+      - ${BLACKBOX_HOME}/config-blackbox.yml:/etc/blackboxexporter/config.yml
     command: 
       - "--config.file=/etc/blackboxexporter/config.yml"
     networks:
@@ -160,7 +160,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - $PROMETHEUS_HOME/:/etc/prometheus/
+      - ${PROMETHEUS_HOME}/:/etc/prometheus/
     command: 
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
