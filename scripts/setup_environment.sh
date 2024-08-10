@@ -24,6 +24,7 @@ PROMETHEUS_HOME=./prometheus
 
 ## Grafana Envirnment
 GRAFANA_HOME=./grafana
+GRAFANA_ADMIN_PWD=$(echo $RANDOM | shasum | head -c 8)
 
 ## Blackbox Environment
 BLACKBOX_HOME=./blackbox

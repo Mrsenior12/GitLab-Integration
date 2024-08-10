@@ -156,7 +156,20 @@ services:
     networks:
       - configuration_network
 
-  # Grafana:
+  Grafana:
+    image: grafana/grafana:11.1.1
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PWD}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_INSTALL_PLUGINS
+    user: '0'
+    volumes:
+      - ${GRAFANA_HOME}/data:/var/lib/grafana
+    networks:
+      - configuration_network
   # Nginx:
   # Keycloak:
 
