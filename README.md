@@ -1,6 +1,5 @@
 ## To Do list
 - [ ] GitLab:
-    - [ X ] Enable GitLab Container Registry
     - [ X ] Enable metrics for Cadvisor
     - [ X ] Enable metrics for Node Exporter
     - [ ] GitLab sample project to verify if CI/CD runs properly

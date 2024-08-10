@@ -127,5 +127,3 @@ if [[ ${REGISTER_RUNNER} == 1 ]]; then
     docker exec gitlab_runner sed -i 's|volumes = \["/cache"\]|volumes = \["/var/run/dock.sock:/var/run/dock.sock", "/cache"\]|' /etc/gitlab-runner/config.toml 
 
 fi
-
-source .env

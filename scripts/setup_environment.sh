@@ -36,9 +36,6 @@ SCRIPTS_HOME=./scripts
 EOF
 fi;
 
-# Load Environmental Variables
-source .env
-
 REQUIRED_DIRECTORIES=("${GITLAB_HOME}" "${GITLAB_HOME}/gitlab-runner" "${PROMETHEUS_HOME}" "${GRAFANA_HOME}")
 
 for DIRECTORY in "${REQUIRED_DIRECTORIES[@]}"

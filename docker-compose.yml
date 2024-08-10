@@ -10,10 +10,9 @@ services:
       - "443:443" #HTTPS
       - "22:22" #SSH
       - "80:80" #Browser
-      - "5005:5005" #Registry
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://gitlab'
+        external_url 'http://localhost'
         prometheus['enable'] = false
 
         gitlab_rails['monitoring_whitelist'] = ['172.0.0.0/8', '192.168.0.1']
@@ -41,10 +40,6 @@ services:
         }
 
         pgbouncer_exporter['listen_address'] = '0.0.0.0:9188'
-
-        registry_external_url 'http://registry.example.com:5005'
-        registry['enable'] = true
-        registry['debug_addr'] = '0.0.0.0:5001'
         
     volumes:
       - ${GITLAB_HOME}/config:/etc/gitlab
@@ -81,12 +76,6 @@ services:
   gitlab_ci_pipeline_exporter:
     image: quay.io/mvisonneau/gitlab-ci-pipelines-exporter:v0.5.7
     container_name: gitlab_ci_pipeline_exporter
-    # healthcheck:
-    #   test: ["CMD", "/bin/sh", "-c", "sh ${SCRIPTS_HOME}/health_check.sh"]
-    #   interval: 10s
-    #   timeout: 20s
-    #   retries: 15
-    #   start_period: 45s
     depends_on:
       gitlab_server:
         condition: service_healthy
