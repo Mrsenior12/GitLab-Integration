@@ -11,11 +11,6 @@
 - [ ] Grafana
     - [ ] Create Sample dashboard with repo monitoring
     - [ ] Create Sample dashboard with CI/CD monitoring
-- [ ] Nginx
-    - [ ] Use Nginx as proxy server for GitLab and Grafana
-- [ ] Keycloak:
-    - [ ] Create Realm for Grafana
-    - [ ] Create Realm for GitLab (if possible)
 
 ## How to setup environment:
 1. Clone repository
